@@ -17,16 +17,13 @@ export default function DashboardPage({
   onOpenAssistant
 }) {
   const todayTasks = tasks.filter(t => t.status !== 'COMPLETED');
-  const completedTasks = tasks.filter(t => t.status === 'COMPLETED').length;
-  const todayLabel = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   return (
     <div className="space-y-6">
       <section className="home-hero relative overflow-hidden rounded-2xl p-5 sm:p-7">
         <div className="relative z-10 max-w-2xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#A64B32]">{todayLabel}</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#A64B32]">Your day, in focus</p>
           <h2 className="mt-2 text-2xl sm:text-[28px] leading-tight font-semibold text-[#27271F]">A clearer day starts here.</h2>
-          <p className="mt-2 text-xs sm:text-sm text-[#666257]">{todayTasks.length} active {todayTasks.length === 1 ? 'task' : 'tasks'} · {completedTasks} completed</p>
           <button
             onClick={onOpenAssistant}
             className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#D95D39] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#BD4D30] transition-colors"
