@@ -13,10 +13,10 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <aside className="sidebar-shell w-full lg:w-[248px] flex flex-col lg:justify-between shrink-0 lg:min-h-screen">
+    <aside className="sidebar-shell w-full lg:w-[288px] flex flex-col lg:justify-between shrink-0 lg:min-h-screen">
       <div>
         {/* Brand Header */}
-        <div className="sidebar-brand px-4 py-4 lg:px-6 lg:py-6 flex items-center justify-between">
+        <div className="sidebar-brand px-4 py-4 lg:px-7 lg:py-7 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="brand-mark w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold">
               <Sparkles className="w-5 h-5" />
@@ -31,7 +31,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         </div>
 
         {/* Navigation Links */}
-        <nav aria-label="Primary navigation" className="px-2 py-3 lg:px-4 lg:py-5 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible">
+        <nav aria-label="Primary navigation" className="px-2 py-3 lg:px-5 lg:py-6 flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible">
           <p className="nav-label hidden lg:block">Workspace</p>
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -41,7 +41,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 title={item.label}
-                className={`nav-item shrink-0 lg:w-full flex flex-col lg:flex-row items-center gap-1 lg:gap-3 px-3 py-2.5 lg:px-3 lg:py-3 rounded-xl font-medium text-[10px] lg:text-xs transition-colors ${isActive
+                className={`nav-item shrink-0 lg:w-full flex flex-col lg:flex-row items-center gap-1 lg:gap-3 px-3 py-2.5 lg:px-4 lg:py-3.5 rounded-xl font-medium text-[10px] lg:text-sm transition-colors ${isActive
                   ? 'nav-item-active'
                   : 'text-slate-500 hover:text-slate-900 hover:bg-white/60'
                   }`}
@@ -56,20 +56,13 @@ export default function Sidebar({ activeTab, setActiveTab }) {
 
       {/* User Profile Footer */}
       <div className="hidden lg:block p-4">
-        <div className="plan-card mb-3 p-3 rounded-xl">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#F8D36B]">Pro plan</span>
-            <span className="text-sm font-bold text-white">$12<span className="text-[10px] font-medium text-[#BFE5DB]">/mo</span></span>
-          </div>
-          <p className="mt-1 text-[10px] text-[#BFE5DB]">Unlimited AI planning and insights.</p>
-        </div>
         <div className="profile-card flex items-center gap-3 p-3 rounded-xl">
           <div className="avatar w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs">
             US
           </div>
           <div className="overflow-hidden">
             <h4 className="text-xs font-semibold text-slate-900 truncate">Alex Developer</h4>
-            <p className="text-[10px] text-slate-400 truncate">Pro Hackathon Member</p>
+            <p className="text-[10px] text-slate-400 truncate">Premium demo member</p>
           </div>
         </div>
       </div>

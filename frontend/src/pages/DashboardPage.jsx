@@ -100,10 +100,20 @@ export default function DashboardPage({
         </div>
 
         {/* Right Column: In-App Reminders & Productivity Analytics */}
-        <div className="space-y-6">
+        <aside className="dashboard-side-rail space-y-6" aria-label="Plan and productivity summary">
+          <div className="dashboard-premium-card rounded-2xl p-4 lg:sticky lg:top-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#A34E2F]">Premium plan</p>
+                <p className="mt-1 text-sm font-bold text-slate-900">Unlimited focus, $12/mo</p>
+              </div>
+              <span className="plan-badge plan-badge-premium">Upgrade</span>
+            </div>
+            <p className="mt-2 text-[11px] leading-5 text-slate-600">Free plan included. Unlock unlimited AI planning and advanced insights.</p>
+          </div>
           <RemindersWidget tasks={tasks} onStartTask={onStartTask} />
           <AnalyticsWidget tasks={tasks} analysis={analyticsOverview} />
-        </div>
+        </aside>
       </div>
     </div>
   );

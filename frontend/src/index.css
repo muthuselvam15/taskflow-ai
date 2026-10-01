@@ -141,6 +141,49 @@
   border: 1px solid rgba(153, 224, 232, 0.24);
 }
 
+.pricing-panel {
+  background: rgba(248, 253, 255, 0.78);
+  border: 1px solid #C5E1EB;
+}
+
+.plan-option {
+  background: #F8FDFF;
+  border: 1px solid #C5E1EB;
+}
+
+.plan-option-premium {
+  background: linear-gradient(145deg, #FFF8E6, #FFF0E7);
+  border-color: #F0B9A6;
+  box-shadow: 0 10px 24px rgba(217, 93, 57, 0.08);
+}
+
+.plan-badge {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #17627A;
+  background: #D8F1F8;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.plan-badge-premium {
+  color: #A34E2F;
+  background: #FFE0D2;
+}
+
+.dashboard-premium-card {
+  background: linear-gradient(135deg, #FFF9E8, #FFF0E9);
+  border: 1px solid #F0B9A6;
+  border-left: 5px solid #D95D39;
+  box-shadow: 0 12px 24px rgba(217, 93, 57, 0.07);
+}
+
+.dashboard-side-rail {
+  align-self: start;
+}
+
 .avatar {
   background: #D8B79D;
   color: #513D30;
