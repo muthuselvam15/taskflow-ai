@@ -56,6 +56,13 @@ export default function Sidebar({ activeTab, setActiveTab }) {
 
       {/* User Profile Footer */}
       <div className="hidden lg:block p-4">
+        <div className="plan-card mb-3 p-3 rounded-xl">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#F8D36B]">Pro plan</span>
+            <span className="text-sm font-bold text-white">$12<span className="text-[10px] font-medium text-[#BFE5DB]">/mo</span></span>
+          </div>
+          <p className="mt-1 text-[10px] text-[#BFE5DB]">Unlimited AI planning and insights.</p>
+        </div>
         <div className="profile-card flex items-center gap-3 p-3 rounded-xl">
           <div className="avatar w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs">
             US

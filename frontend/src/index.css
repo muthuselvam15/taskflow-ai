@@ -136,6 +136,11 @@
   border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
+.plan-card {
+  background: linear-gradient(135deg, rgba(23, 135, 160, 0.55), rgba(27, 145, 137, 0.35));
+  border: 1px solid rgba(153, 224, 232, 0.24);
+}
+
 .avatar {
   background: #D8B79D;
   color: #513D30;
