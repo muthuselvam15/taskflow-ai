@@ -36,7 +36,7 @@ flowchart TD
     Gemini -->|JSON Structured Tasks| Backend
     Backend -->|Smart Priority Rules| PriorityEngine[Task Priority Engine]
     PriorityEngine -->|Next Task Scoring| RecEngine[Next Task Recommendation Engine]
-    RecEngine -->|Save Tasks| DB[(SQLite Database)]
+   RecEngine -->|Save Tasks| DB[(Neon PostgreSQL)]
     Backend -->|JSON Response| Frontend
     Frontend --> Dashboard["Dashboard UI (Today's Focus)"]
     Dashboard --> RecommendationCard["✨ WHAT SHOULD I DO NOW? Card"]
@@ -49,8 +49,8 @@ flowchart TD
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 18, Vite 6, Tailwind CSS v3, Lucide React icons, Canvas Confetti.
-- **Backend**: Python FastAPI, Uvicorn, SQLite3, `google-genai` / `google.generativeai`, `pydantic`.
-- **Storage**: SQLite (`taskflow.db`) as the single source of truth + LocalStorage UI cache.
+- **Backend**: Python FastAPI, Uvicorn, PostgreSQL via Psycopg 3, `google-genai`, and Pydantic.
+- **Storage**: Neon PostgreSQL as the source of truth + LocalStorage UI cache.
 
 ---
 
@@ -70,12 +70,19 @@ pip install -r requirements.txt
 ```
 
 #### Environment Variables (`backend/.env`):
-Create a `.env` file inside `backend/`:
+Copy `backend/.env.example` to `backend/.env` and set the values from your Neon project and Gemini account:
 ```env
+DATABASE_URL=postgresql://USER:PASSWORD@HOST/DBNAME?sslmode=require
 GEMINI_API_KEY=your_gemini_api_key_here
 PORT=8000
 ```
-> Note: If `GEMINI_API_KEY` is omitted, TaskFlow AI automatically uses its smart deterministic fallback engine!
+`DATABASE_URL` is required. Copy the Neon connection string from the Neon dashboard and keep it private. If `GEMINI_API_KEY` is omitted, TaskFlow AI uses its deterministic fallback engine.
+
+To import existing local SQLite tasks into Neon once, configure `DATABASE_URL` and run:
+```bash
+python migrate_sqlite_to_neon.py
+```
+The importer leaves `taskflow.db` untouched. Run it once before deploying if you want to keep existing local tasks.
 
 Start the backend server:
 ```bash
@@ -111,9 +118,9 @@ The app will start at `http://localhost:5173`.
    > *"This task has the closest deadline (Tomorrow at 6:00 PM) among your HIGH priority pending tasks."*
 8. Click **`[ START TASK ]`** on the recommendation card. Task updates to **IN_PROGRESS**.
 9. Click the completion checkbox on **DBMS Assignment**. Watch celebratory confetti and productivity score update.
-10. Refresh the page to verify data persistence in SQLite.
+10. Refresh the page to verify data persistence in Neon.
 
 ---
 
 ## 🛡️ Security
-`GEMINI_API_KEY` is kept strictly within the backend `.env` file and is **never** exposed to the frontend browser context.
+`GEMINI_API_KEY` and `DATABASE_URL` stay in the backend environment and are never exposed to the frontend. Do not commit `backend/.env`; configure the same variables in your deployment provider's environment settings.

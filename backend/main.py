@@ -1,5 +1,3 @@
-import os
-import sqlite3
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 
@@ -61,14 +59,14 @@ class SubtaskToggle(BaseModel):
 # Helper DB functions
 def fetch_full_task(conn, task_id: int) -> Optional[Dict[str, Any]]:
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("SELECT * FROM tasks WHERE id = %s", (task_id,))
     row = cursor.fetchone()
     if not row:
         return None
     task = dict(row)
     
     # Fetch subtasks
-    cursor.execute("SELECT * FROM subtasks WHERE task_id = ?", (task_id,))
+    cursor.execute("SELECT * FROM subtasks WHERE task_id = %s", (task_id,))
     sub_rows = cursor.fetchall()
     task["subtasks"] = [dict(s) for s in sub_rows]
     return task
@@ -81,7 +79,7 @@ def fetch_all_tasks(conn) -> List[Dict[str, Any]]:
     tasks = []
     for r in task_rows:
         t = dict(r)
-        cursor.execute("SELECT * FROM subtasks WHERE task_id = ?", (t["id"],))
+        cursor.execute("SELECT * FROM subtasks WHERE task_id = %s", (t["id"],))
         t["subtasks"] = [dict(s) for s in cursor.fetchall()]
         tasks.append(t)
     return tasks
@@ -117,16 +115,17 @@ def analyze_and_create_tasks(payload: AnalyzeRequest):
         
         cursor.execute("""
             INSERT INTO tasks (title, description, priority, status, deadline, estimated_minutes, actual_minutes, reminder, created_at, updated_at)
-            VALUES (?, ?, ?, 'PENDING', ?, ?, 0, ?, ?, ?)
+            VALUES (%s, %s, %s, 'PENDING', %s, %s, 0, %s, %s, %s)
+            RETURNING id
         """, (title, desc, prio, deadline, est_min, reminder, now_str, now_str))
         
-        task_id = cursor.lastrowid
+        task_id = cursor.fetchone()["id"]
         
         for sub_title in subtasks_list:
             if isinstance(sub_title, str) and sub_title.strip():
                 cursor.execute("""
                     INSERT INTO subtasks (task_id, title, completed)
-                    VALUES (?, ?, 0)
+                    VALUES (%s, %s, FALSE)
                 """, (task_id, sub_title.strip()))
                 
         full_t = fetch_full_task(conn, task_id)
@@ -158,15 +157,16 @@ def create_task_manual(payload: TaskCreate):
     
     cursor.execute("""
         INSERT INTO tasks (title, description, priority, status, deadline, estimated_minutes, actual_minutes, reminder, created_at, updated_at)
-        VALUES (?, ?, ?, 'PENDING', ?, ?, 0, ?, ?, ?)
+        VALUES (%s, %s, %s, 'PENDING', %s, %s, 0, %s, %s, %s)
+        RETURNING id
     """, (payload.title, payload.description or "", payload.priority or "MEDIUM", payload.deadline, payload.estimated_minutes or 30, payload.reminder, now_str, now_str))
     
-    task_id = cursor.lastrowid
+    task_id = cursor.fetchone()["id"]
     
     if payload.subtasks:
         for st in payload.subtasks:
             if isinstance(st, str) and st.strip():
-                cursor.execute("INSERT INTO subtasks (task_id, title, completed) VALUES (?, ?, 0)", (task_id, st.strip()))
+                cursor.execute("INSERT INTO subtasks (task_id, title, completed) VALUES (%s, %s, FALSE)", (task_id, st.strip()))
                 
     conn.commit()
     task = fetch_full_task(conn, task_id)
@@ -187,7 +187,7 @@ def update_task(task_id: int, payload: TaskUpdate):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("SELECT * FROM tasks WHERE id = %s", (task_id,))
     existing = cursor.fetchone()
     if not existing:
         conn.close()
@@ -199,15 +199,15 @@ def update_task(task_id: int, payload: TaskUpdate):
     for field in ["title", "description", "priority", "status", "deadline", "estimated_minutes", "actual_minutes", "reminder"]:
         val = getattr(payload, field, None)
         if val is not None:
-            updates.append(f"{field} = ?")
+            updates.append(f"{field} = %s")
             params.append(val)
             
     if updates:
-        updates.append("updated_at = ?")
+        updates.append("updated_at = %s")
         params.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         params.append(task_id)
         
-        query = f"UPDATE tasks SET {', '.join(updates)} WHERE id = ?"
+        query = f"UPDATE tasks SET {', '.join(updates)} WHERE id = %s"
         cursor.execute(query, tuple(params))
         conn.commit()
         
@@ -219,8 +219,8 @@ def update_task(task_id: int, payload: TaskUpdate):
 def delete_task(task_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM subtasks WHERE task_id = ?", (task_id,))
-    cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("DELETE FROM subtasks WHERE task_id = %s", (task_id,))
+    cursor.execute("DELETE FROM tasks WHERE id = %s", (task_id,))
     conn.commit()
     conn.close()
     return {"success": True, "message": "Task deleted successfully"}
@@ -230,18 +230,18 @@ def toggle_subtask(subtask_id: int, payload: SubtaskToggle):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute("UPDATE subtasks SET completed = ? WHERE id = ?", (1 if payload.completed else 0, subtask_id))
-    cursor.execute("SELECT task_id FROM subtasks WHERE id = ?", (subtask_id,))
+    cursor.execute("UPDATE subtasks SET completed = %s WHERE id = %s", (payload.completed, subtask_id))
+    cursor.execute("SELECT task_id FROM subtasks WHERE id = %s", (subtask_id,))
     row = cursor.fetchone()
     
     task = None
     if row:
         task_id = row["task_id"]
         # Check if all subtasks completed
-        cursor.execute("SELECT COUNT(*) as total, SUM(completed) as done FROM subtasks WHERE task_id = ?", (task_id,))
+        cursor.execute("SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE completed) AS done FROM subtasks WHERE task_id = %s", (task_id,))
         stats = cursor.fetchone()
         if stats and stats["total"] > 0 and stats["total"] == stats["done"]:
-            cursor.execute("UPDATE tasks SET status = 'COMPLETED' WHERE id = ?", (task_id,))
+            cursor.execute("UPDATE tasks SET status = 'COMPLETED' WHERE id = %s", (task_id,))
         conn.commit()
         task = fetch_full_task(conn, task_id)
         
@@ -325,12 +325,13 @@ def seed_demo_data():
     for dt in demo_tasks:
         cursor.execute("""
             INSERT INTO tasks (title, description, priority, status, deadline, estimated_minutes, actual_minutes, reminder, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, 0, %s, %s, %s)
+            RETURNING id
         """, (dt["title"], dt["description"], dt["priority"], dt["status"], dt["deadline"], dt["estimated_minutes"], dt["reminder"], now_str, now_str))
         
-        t_id = cursor.lastrowid
+        t_id = cursor.fetchone()["id"]
         for st in dt["subtasks"]:
-            cursor.execute("INSERT INTO subtasks (task_id, title, completed) VALUES (?, ?, 0)", (t_id, st))
+            cursor.execute("INSERT INTO subtasks (task_id, title, completed) VALUES (%s, %s, FALSE)", (t_id, st))
         full_t = fetch_full_task(conn, t_id)
         if full_t:
             created.append(full_t)
