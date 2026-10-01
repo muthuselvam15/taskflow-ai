@@ -13,25 +13,26 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <aside className="w-full lg:w-60 bg-[#F0E9DC] border-b lg:border-b-0 lg:border-r border-slate-800 flex flex-col lg:justify-between shrink-0 lg:min-h-screen">
+    <aside className="sidebar-shell w-full lg:w-[248px] flex flex-col lg:justify-between shrink-0 lg:min-h-screen">
       <div>
         {/* Brand Header */}
-        <div className="px-4 py-3 lg:px-5 lg:py-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="sidebar-brand px-4 py-4 lg:px-6 lg:py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#D95D39] flex items-center justify-center text-white font-bold">
-              <Sparkles className="w-4 h-4" />
+            <div className="brand-mark w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold">
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-                TaskFlow <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#EAD3C8] text-[#9B422B]">AI</span>
+              <h1 className="font-bold text-base text-slate-900 flex items-center gap-1.5 tracking-tight">
+                TaskFlow <span className="brand-pill">AI</span>
               </h1>
-              <p className="text-[10px] text-slate-500 font-medium">Make today count</p>
+              <p className="text-[10px] text-slate-500 font-medium tracking-wide">PERSONAL COMMAND CENTER</p>
             </div>
           </div>
         </div>
 
         {/* Navigation Links */}
-        <nav className="px-2 py-2 lg:p-3 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible">
+        <nav aria-label="Primary navigation" className="px-2 py-3 lg:px-4 lg:py-5 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible">
+          <p className="nav-label hidden lg:block">Workspace</p>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -40,12 +41,12 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 title={item.label}
-                className={`shrink-0 lg:w-full flex flex-col lg:flex-row items-center gap-1 lg:gap-3 px-3 py-2 lg:px-3 lg:py-2.5 rounded-lg font-medium text-[10px] lg:text-xs transition-colors ${isActive
-                    ? 'bg-[#E9D4C9] text-[#9B422B] border border-[#E5C4B5]'
-                    : 'text-slate-500 hover:text-slate-900 hover:bg-white/60'
+                className={`nav-item shrink-0 lg:w-full flex flex-col lg:flex-row items-center gap-1 lg:gap-3 px-3 py-2.5 lg:px-3 lg:py-3 rounded-xl font-medium text-[10px] lg:text-xs transition-colors ${isActive
+                  ? 'nav-item-active'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-white/60'
                   }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#B94A31]' : 'text-slate-500'}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-[#B94A31]' : 'text-slate-500'}`} strokeWidth={isActive ? 2.4 : 2} />
                 <span>{item.label}</span>
               </button>
             );
@@ -54,9 +55,9 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       </div>
 
       {/* User Profile Footer */}
-      <div className="hidden lg:block p-3 border-t border-slate-800/80">
-        <div className="flex items-center gap-3 p-2 rounded-lg bg-white/60 border border-slate-800/60">
-          <div className="w-8 h-8 rounded-full bg-[#D8B79D] flex items-center justify-center font-bold text-xs text-[#513D30]">
+      <div className="hidden lg:block p-4">
+        <div className="profile-card flex items-center gap-3 p-3 rounded-xl">
+          <div className="avatar w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs">
             US
           </div>
           <div className="overflow-hidden">

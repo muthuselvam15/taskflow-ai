@@ -1,6 +1,12 @@
 from datetime import datetime, timedelta
+from base64 import b64encode
+from io import BytesIO
 from typing import List, Optional, Dict, Any
 
+import matplotlib
+matplotlib.use("Agg")
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -181,6 +187,70 @@ def get_next_task():
     
     recommendation = get_next_recommended_task(tasks)
     return {"success": True, "recommendation": recommendation}
+
+@app.get("/api/analytics/overview")
+def get_analytics_overview():
+    conn = get_db_connection()
+    tasks = fetch_all_tasks(conn)
+    conn.close()
+
+    total = len(tasks)
+    completed = sum(task.get("status") == "COMPLETED" for task in tasks)
+    in_progress = sum(task.get("status") == "IN_PROGRESS" for task in tasks)
+    pending = total - completed - in_progress
+    estimated_minutes = sum(task.get("estimated_minutes") or 0 for task in tasks)
+    completion_rate = round((completed / total) * 100) if total else 0
+
+    status_labels = ["Completed", "In progress", "Pending"]
+    status_values = [completed, in_progress, pending]
+    priority_labels = ["High", "Medium", "Low"]
+    priority_values = [
+        sum(task.get("priority") == priority for task in tasks)
+        for priority in ["HIGH", "MEDIUM", "LOW"]
+    ]
+
+    figure = Figure(figsize=(8, 3.1), dpi=140, facecolor="#FFFCF6")
+    axes = figure.subplots(1, 2)
+    figure.subplots_adjust(left=0.08, right=0.98, bottom=0.24, top=0.8, wspace=0.38)
+
+    axes[0].bar(status_labels, status_values, color=["#6B976F", "#D95D39", "#D8B79D"], width=0.58)
+    axes[0].set_title("Task status", loc="left", fontsize=10, color="#292A24", pad=12)
+    axes[0].set_ylim(0, max(status_values + [1]) + 1)
+    axes[0].tick_params(axis="both", labelsize=8, colors="#706D63", length=0)
+
+    axes[1].bar(priority_labels, priority_values, color=["#C45B49", "#D5A449", "#6B976F"], width=0.58)
+    axes[1].set_title("Priority mix", loc="left", fontsize=10, color="#292A24", pad=12)
+    axes[1].set_ylim(0, max(priority_values + [1]) + 1)
+    axes[1].tick_params(axis="both", labelsize=8, colors="#706D63", length=0)
+
+    for axis in axes:
+        axis.spines[["top", "right", "left"]].set_visible(False)
+        axis.spines["bottom"].set_color("#E2DACC")
+        axis.grid(axis="y", color="#E2DACC", linewidth=0.7, alpha=0.7)
+        axis.set_axisbelow(True)
+
+    buffer = BytesIO()
+    FigureCanvasAgg(figure).print_png(buffer)
+    chart = b64encode(buffer.getvalue()).decode("ascii")
+
+    return {
+        "success": True,
+        "chart": f"data:image/png;base64,{chart}",
+        "alt_text": (
+            f"Task analysis: {completed} completed, {in_progress} in progress, "
+            f"and {pending} pending out of {total} total tasks. "
+            f"Priority counts are {priority_values[0]} high, {priority_values[1]} medium, "
+            f"and {priority_values[2]} low."
+        ),
+        "summary": {
+            "total": total,
+            "completed": completed,
+            "in_progress": in_progress,
+            "pending": pending,
+            "estimated_minutes": estimated_minutes,
+            "completion_rate": completion_rate,
+        },
+    }
 
 @app.patch("/api/tasks/{task_id}")
 def update_task(task_id: int, payload: TaskUpdate):

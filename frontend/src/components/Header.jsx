@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Bell, Search } from 'lucide-react';
 
 export default function Header({ tasksCount = 0, completedCount = 0 }) {
   const getGreeting = () => {
@@ -17,22 +17,29 @@ export default function Header({ tasksCount = 0, completedCount = 0 }) {
   });
 
   return (
-    <header className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-slate-800/80 gap-4">
+    <header className="page-header flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-8 gap-4">
       <div>
-        <h1 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
+        <p className="eyebrow">THURSDAY, OCTOBER 1, 2026</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold text-black flex items-center gap-2 tracking-tight mt-1">
           {getGreeting()}, Alex
         </h1>
-        <p className="text-xs text-black mt-1">Here’s what needs your attention today.</p>
+        <p className="text-sm text-slate-500 mt-1">Here’s what needs your attention today.</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-        <div className="flex items-center gap-2 text-xs font-medium text-black bg-white/70 border border-slate-800 px-3 py-2 rounded-lg">
-          <CalendarIcon className="w-4 h-4 text-black" />
+      <div className="flex flex-wrap items-center gap-2 shrink-0">
+        <button className="icon-button" title="Search tasks" aria-label="Search tasks">
+          <Search className="w-4 h-4" />
+        </button>
+        <button className="icon-button" title="Notifications" aria-label="Notifications">
+          <Bell className="w-4 h-4" />
+        </button>
+        <div className="status-chip flex items-center gap-2 text-xs font-medium text-black px-3 py-2.5 rounded-xl">
+          <CalendarIcon className="w-4 h-4 text-[#B94A31]" />
           <span>{currentDate}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-medium text-black bg-white/70 border border-slate-800 px-3 py-2 rounded-lg">
-          <Clock className="w-4 h-4 text-black" />
+        <div className="status-chip flex items-center gap-2 text-xs font-medium text-black px-3 py-2.5 rounded-xl">
+          <Clock className="w-4 h-4 text-[#52765A]" />
           <span>{completedCount} / {tasksCount} done</span>
         </div>
       </div>

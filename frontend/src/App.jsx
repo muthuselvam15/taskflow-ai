@@ -20,7 +20,8 @@ import {
   deleteTask,
   createManualTask,
   seedDemoData,
-  clearAllTasks
+  clearAllTasks,
+  fetchAnalyticsOverview
 } from './services/api';
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
   const [loadingAI, setLoadingAI] = useState(false);
   const [fallbackMessage, setFallbackMessage] = useState(null);
   const [manualModalOpen, setManualModalOpen] = useState(false);
+  const [analyticsOverview, setAnalyticsOverview] = useState(null);
 
   const loadData = async () => {
     try {
@@ -39,6 +41,13 @@ export default function App() {
 
       const rec = await fetchNextRecommendation();
       setRecommendation(rec);
+
+      try {
+        setAnalyticsOverview(await fetchAnalyticsOverview());
+      } catch (err) {
+        console.warn('Analytics overview unavailable:', err);
+        setAnalyticsOverview(null);
+      }
     } catch (err) {
       console.error('Error loading data:', err);
     }
@@ -134,11 +143,12 @@ export default function App() {
 
   return (
     <div className="warm-app flex flex-col lg:flex-row min-h-screen bg-[#F4EFE5] text-slate-900">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       {/* Left Sidebar */}
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-[1440px] mx-auto w-full overflow-y-auto">
+      <main id="main-content" tabIndex="-1" className="app-main flex-1 min-w-0 p-4 sm:p-6 lg:p-10 max-w-[1440px] mx-auto w-full overflow-y-auto">
         <Header tasksCount={tasks.length} completedCount={completedCount} />
 
         {activeTab === 'dashboard' && (
@@ -155,6 +165,7 @@ export default function App() {
             onSeedDemo={handleSeedDemo}
             onOpenManualModal={() => setManualModalOpen(true)}
             onOpenAssistant={() => setActiveTab('assistant')}
+            analyticsOverview={analyticsOverview}
           />
         )}
 

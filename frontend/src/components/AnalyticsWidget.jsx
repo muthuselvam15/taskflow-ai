@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart3, CheckCircle, Clock, Zap, TrendingUp } from 'lucide-react';
 
-export default function AnalyticsWidget({ tasks = [] }) {
+export default function AnalyticsWidget({ tasks = [], analysis = null }) {
   const total = tasks.length;
   const completed = tasks.filter(t => t.status === 'COMPLETED').length;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -66,35 +66,55 @@ export default function AnalyticsWidget({ tasks = [] }) {
         </div>
       </div>
 
-      {/* Single Clean CSS Bar Chart */}
-      <div>
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-          <span>Weekly Focus Volume</span>
-          <span>Target: 5 tasks/day</span>
+      {analysis?.chart ? (
+        <div className="analytics-figure">
+          <img
+            src={analysis.chart}
+            alt={analysis.alt_text}
+            className="w-full rounded-xl border border-[#E2DACC]"
+          />
+          <p className="sr-only">{analysis.alt_text}</p>
+          <div className="analytics-summary" aria-label="Analytics summary">
+            <span><strong>{analysis.summary.completed}</strong> completed</span>
+            <span><strong>{analysis.summary.in_progress}</strong> active</span>
+            <span><strong>{analysis.summary.estimated_minutes}m</strong> planned</span>
+          </div>
         </div>
+      ) : total === 0 ? (
+        <div className="border-t border-slate-800/80 pt-5 text-center">
+          <BarChart3 className="w-7 h-7 mx-auto mb-2 text-slate-400" />
+          <p className="text-sm font-semibold text-slate-700">No analytics data yet</p>
+          <p className="text-xs text-slate-500 mt-1">Create a task to start tracking your productivity.</p>
+        </div>
+      ) : (
+        <div>
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+            <span>Weekly Focus Volume</span>
+            <span>Target: 5 tasks/day</span>
+          </div>
 
-        <div className="flex items-end justify-between gap-2 h-24 pt-4 border-t border-slate-800/80">
-          {weeklyData.map((d, idx) => {
-            const barHeightPct = Math.min(100, Math.max(15, (d.completed / 6) * 100));
-            const isToday = d.day === 'Thu';
-            return (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                <div className="w-full bg-slate-950 rounded-t-lg overflow-hidden h-full flex items-end">
-                  <div
-                    className={`w-full rounded-t-lg transition-all duration-500 ${
-                      isToday ? 'bg-indigo-500 shadow-lg shadow-indigo-500/30' : 'bg-slate-700'
-                    }`}
-                    style={{ height: `${barHeightPct}%` }}
-                  />
+          <div className="flex items-end justify-between gap-2 h-24 pt-4 border-t border-slate-800/80">
+            {weeklyData.map((d, idx) => {
+              const barHeightPct = Math.min(100, Math.max(15, (d.completed / 6) * 100));
+              const isToday = d.day === 'Thu';
+              return (
+                <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                  <div className="w-full bg-slate-950 rounded-t-lg overflow-hidden h-full flex items-end">
+                    <div
+                      className={`w-full rounded-t-lg transition-all duration-500 ${isToday ? 'bg-indigo-500 shadow-lg shadow-indigo-500/30' : 'bg-slate-700'
+                        }`}
+                      style={{ height: `${barHeightPct}%` }}
+                    />
+                  </div>
+                  <span className={`text-[10px] font-medium ${isToday ? 'text-indigo-400 font-bold' : 'text-slate-500'}`}>
+                    {d.day}
+                  </span>
                 </div>
-                <span className={`text-[10px] font-medium ${isToday ? 'text-indigo-400 font-bold' : 'text-slate-500'}`}>
-                  {d.day}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
