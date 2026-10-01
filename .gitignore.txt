@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+
+# Environment variables / API keys
+.env
+.env.*
+!.env.example
+
+# Build files
+dist/
+build/
+.next/
+.vercel/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    @apply bg-[#F4EFE5] text-slate-900 antialiased selection:bg-indigo-500 selection:text-white;
+    font-family: 'Aptos', 'Segoe UI', sans-serif;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4EFE5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9BFAE;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A79B88;
+}
+
+.warm-app {
+  --paper: #F4EFE5;
+  --card: #FFFCF6;
+  --ink: #292A24;
+  --muted: #706D63;
+  --line: #E2DACC;
+  --accent: #D95D39;
+}
+
+.warm-app [class*="0F172A"] {
+  background-color: #FFFCF6;
+}
+
+.warm-app [class*="bg-slate-950"],
+.warm-app [class*="bg-slate-900"] {
+  background-color: #F7F3EA;
+}
+
+.warm-app [class*="bg-slate-800"] {
+  background-color: #EBE4D8;
+}
+
+.warm-app [class*="border-slate-800"],
+.warm-app [class*="border-slate-700"] {
+  border-color: #E2DACC;
+}
+
+.warm-app [class~="text-slate-100"],
+.warm-app [class~="text-slate-200"] {
+  color: #34332C;
+}
+
+.warm-app [class~="text-slate-300"],
+.warm-app [class~="text-slate-400"] {
+  color: #706D63;
+}
+
+.warm-app main [class~="text-white"]:not(button):not(button *) {
+  color: #292A24;
+}
+
+.home-hero {
+  min-height: 188px;
+  background: #E9E0D1;
+  border: 1px solid #DED4C3;
+  background-image: linear-gradient(105deg, rgba(255, 252, 246, 0.6), rgba(233, 224, 209, 0.2));
+}
+
+.home-hero h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 500;
+}
+
+.home-hero-mark {
+  position: absolute;
+  right: 7%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 132px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(166, 75, 50, 0.28);
+  border-radius: 50%;
+  color: rgba(166, 75, 50, 0.55);
+  transform: translateY(-50%);
+}
+
+.home-hero-mark::before,
+.home-hero-mark::after {
+  position: absolute;
+  content: '';
+  border: 1px solid rgba(166, 75, 50, 0.2);
+  border-radius: 50%;
+  inset: 12px;
+}
+
+.home-hero-mark::after {
+  inset: 27px;
+}
+
+.home-hero-mark span {
+  font-family: Georgia, serif;
+  font-size: 22px;
+}
+
+.assistant-composer {
+  background: #E8EEE5;
+  border: 1px solid #D4DFD0;
+}
+
+.hover-glow {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-glow:hover {
+  border-color: rgba(185, 74, 49, 0.4);
+  box-shadow: 0 8px 24px -18px rgba(90, 57, 41, 0.4);
+}
+
+@media (max-width: 640px) {
+  .home-hero-mark {
+    right: -38px;
+    opacity: 0.35;
+  }
+}
